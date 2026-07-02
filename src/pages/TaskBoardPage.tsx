@@ -19,8 +19,6 @@ import { Project, ProjectMemberRole, Task, TaskStatus, User, UserBasic } from '.
 import Navbar from '../components/Navbar';
 import Loader from '../components/Loader';
 import ErrorMessage from '../components/ErrorMessage';
-import TaskColumn from '../components/TaskColumn';
-import TaskFormModal from '../components/TaskFormModal';
 import AddMemberModal from '../components/AddMemberModal';
 
 const COLUMNS: { status: TaskStatus; title: string }[] = [
@@ -30,6 +28,9 @@ const COLUMNS: { status: TaskStatus; title: string }[] = [
 ];
 
 import { getUserId } from '../utils/user';
+import { isProjectManager } from '../utils/permissions';
+import TaskColumn from '../components/TaskColumn';
+import TaskFormModal from '../components/TaskFormModal';
 
 function asUser(value: User | string | undefined | null): UserBasic | null {
   if (!value || typeof value === 'string') return null;
@@ -42,6 +43,7 @@ export default function TaskBoardPage() {
   const { projectId } = useParams<{ projectId: string }>();
   const dispatch = useAppDispatch();
   const { items: tasks, status, error } = useAppSelector((state) => state.tasks);
+  const currentUserId = useAppSelector((state) => state.auth.user?.id ?? null);
 
   const [project, setProject] = useState<Project | null>(null);
   const [projectError, setProjectError] = useState<string | null>(null);
@@ -156,6 +158,14 @@ export default function TaskBoardPage() {
     }
     return users;
   }, [project]);
+
+  // Only managers (project owner, or a member explicitly added with role
+  // 'manager') can edit task details. Any member can still drag tasks
+  // between columns — see handleDropTask, which is never gated.
+  const canEditTasks = useMemo(
+    () => isProjectManager(project, currentUserId),
+    [project, currentUserId]
+  );
 
   const handleDropTask = (taskId: string, newStatus: TaskStatus) => {
     const task = tasks.find((t) => t._id === taskId);
@@ -286,6 +296,7 @@ export default function TaskBoardPage() {
                 onEditTask={handleEditTask}
                 onDeleteTask={handleDeleteTask}
                 onAddTask={handleAddTask}
+                canEdit={canEditTasks}
               />
             ))}
           </div>

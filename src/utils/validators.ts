@@ -78,9 +78,22 @@ export function validateProjectForm(values: ProjectFormValues) {
   };
 }
 
+export function validateDueDate(value: string, isEdit: boolean): string | undefined {
+  if (!value) return undefined; // optional field
+  if (isEdit) return undefined; // don't block editing an already-overdue task
+  // value is a yyyy-mm-dd string from <input type="date">; compare by calendar day
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const picked = new Date(`${value}T00:00:00`);
+  if (picked < today) return 'Due date cannot be in the past';
+  return undefined;
+}
+
 export interface TaskFormValues {
   title: string;
   description: string;
+  dueDate: string;
+  isEdit: boolean;
 }
 
 export function validateTaskForm(values: TaskFormValues) {
@@ -90,6 +103,7 @@ export function validateTaskForm(values: TaskFormValues) {
       validateMaxLength(values.title, 200, 'Title')
     ),
     description: validateMaxLength(values.description, 2000, 'Description'),
+    dueDate: validateDueDate(values.dueDate, values.isEdit),
   };
 }
 

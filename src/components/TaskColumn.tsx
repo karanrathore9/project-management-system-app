@@ -10,6 +10,7 @@ interface Props {
   onEditTask: (task: Task) => void;
   onDeleteTask: (taskId: string) => void;
   onAddTask: (status: TaskStatus) => void;
+  canEdit: boolean;
 }
 
 export default function TaskColumn({
@@ -20,6 +21,7 @@ export default function TaskColumn({
   onEditTask,
   onDeleteTask,
   onAddTask,
+  canEdit,
 }: Props) {
   const [isOver, setIsOver] = useState(false);
 
@@ -51,7 +53,7 @@ export default function TaskColumn({
       <div className="task-column-body">
         {tasks.length === 0 && <p className="muted empty-hint">No tasks</p>}
         {tasks.map((task) => (
-          <TaskCard key={task._id} task={task} onEdit={onEditTask} onDelete={onDeleteTask} />
+          <TaskCard key={task._id} task={task} onEdit={onEditTask} onDelete={onDeleteTask} canEdit={canEdit} />
         ))}
       </div>
     </div>

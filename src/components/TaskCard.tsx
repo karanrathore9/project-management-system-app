@@ -4,6 +4,7 @@ interface Props {
   task: Task;
   onEdit: (task: Task) => void;
   onDelete: (taskId: string) => void;
+  canEdit: boolean;
 }
 
 const priorityLabel: Record<Task['priority'], string> = {
@@ -12,7 +13,7 @@ const priorityLabel: Record<Task['priority'], string> = {
   high: 'High',
 };
 
-export default function TaskCard({ task, onEdit, onDelete }: Props) {
+export default function TaskCard({ task, onEdit, onDelete, canEdit }: Props) {
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
     e.dataTransfer.setData('text/plain', task._id);
     e.dataTransfer.effectAllowed = 'move';
@@ -30,9 +31,11 @@ export default function TaskCard({ task, onEdit, onDelete }: Props) {
         {task.dueDate && <span className="muted">{new Date(task.dueDate).toLocaleDateString()}</span>}
       </div>
       <div className="task-card-actions">
-        <button className="link-btn" onClick={() => onEdit(task)}>
-          Edit
-        </button>
+        {canEdit && (
+          <button className="link-btn" onClick={() => onEdit(task)}>
+            Edit
+          </button>
+        )}
         <button className="link-btn link-btn-danger" onClick={() => onDelete(task._id)}>
           Delete
         </button>

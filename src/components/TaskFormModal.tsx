@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { Task, TaskPriority, TaskStatus, UserBasic } from '../types';
-import { validateTaskForm, isValid } from '../utils/validators';
+
+import { isValid, validateTaskForm } from '../utils/validators';
 import { getUserId } from '../utils/user';
 
 interface Props {
@@ -28,7 +29,7 @@ export default function TaskFormModal({ initial, assignableUsers, onClose, onSub
   const [touched, setTouched] = useState(false);
 
   const isEdit = Boolean(initial);
-  const errors = validateTaskForm({ title, description });
+  const errors = validateTaskForm({ title, description, dueDate, isEdit });
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -107,7 +108,13 @@ export default function TaskFormModal({ initial, assignableUsers, onClose, onSub
             )}
             <label className="field">
               <span>Due date</span>
-              <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+              <input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                min={isEdit ? undefined : new Date().toISOString().slice(0, 10)}
+              />
+              {touched && errors.dueDate && <span className="field-error">{errors.dueDate}</span>}
             </label>
           </div>
           <div className="modal-actions">
