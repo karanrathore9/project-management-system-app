@@ -79,9 +79,8 @@ export function validateProjectForm(values: ProjectFormValues) {
 }
 
 export function validateDueDate(value: string, isEdit: boolean): string | undefined {
-  if (!value) return undefined; // optional field
-  if (isEdit) return undefined; // don't block editing an already-overdue task
-  // value is a yyyy-mm-dd string from <input type="date">; compare by calendar day
+  if (!value) return undefined; 
+  if (isEdit) return undefined; 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const picked = new Date(`${value}T00:00:00`);

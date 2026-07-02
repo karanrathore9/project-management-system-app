@@ -56,7 +56,6 @@ export default function TaskBoardPage() {
   const [showAddMember, setShowAddMember] = useState(false);
   const [onlineCount, setOnlineCount] = useState(0);
 
-  // Load project details + task list, and join the real-time room.
   useEffect(() => {
     if (!projectId) return;
 
@@ -84,7 +83,6 @@ export default function TaskBoardPage() {
     };
   }, [projectId, dispatch]);
 
-  // Wire up real-time listeners for this project's room.
   useEffect(() => {
     const socket = getSocket();
     if (!socket) return;
@@ -101,8 +99,7 @@ export default function TaskBoardPage() {
     const onTaskDeleted = ({ taskId }: { taskId: string }) => {
       dispatch(taskDeletedFromSocket(taskId));
     };
-    // Keep the member list (and therefore the assignee picker) live when
-    // anyone adds a member or otherwise updates the project.
+    
     const onProjectUpdated = ({ project: updated }: { project: Project }) => {
       if (updated._id === projectId) setProject(updated);
     };
@@ -139,7 +136,6 @@ export default function TaskBoardPage() {
     return grouped;
   }, [tasks]);
 
-  // Owner + members, deduped, for the "assignee" dropdown and the member list panel.
   const assignableUsers: UserBasic[] = useMemo(() => {
     if (!project) return [];
     const seen = new Set<string>();
@@ -159,9 +155,7 @@ export default function TaskBoardPage() {
     return users;
   }, [project]);
 
-  // Only managers (project owner, or a member explicitly added with role
-  // 'manager') can edit task details. Any member can still drag tasks
-  // between columns — see handleDropTask, which is never gated.
+  
   const canEditTasks = useMemo(
     () => isProjectManager(project, currentUserId),
     [project, currentUserId]
